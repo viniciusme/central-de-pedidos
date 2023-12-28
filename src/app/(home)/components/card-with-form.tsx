@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { Button } from '@/app/components/ui/button';
+import { Button } from '@nextui-org/react';
 import {
   Card,
   CardContent,
@@ -37,8 +37,11 @@ export function CardWithForm() {
         </form>
       </CardContent>
 
-      <CardFooter className='flex justify-between'>
-        <Button className='w-full bg-brandFirst-500 hover:bg-brandFirst-600 active:bg-brandFirst-700 focus:outline-none focus:ring focus:ring-brandFirst-300'>
+      <CardFooter className='flex justify-between mt-5'>
+        <Button
+          radius='md'
+          className='w-full bg-gradient-to-tr from-brandFirst-300 to-brandFirst-500 text-white hover:shadow-lg hover:bg-brandFirst-600 active:bg-brandFirst-700 focus:outline-none focus:ring focus:ring-brandFirst-300 uppercase'
+        >
           Entrar
         </Button>
       </CardFooter>
