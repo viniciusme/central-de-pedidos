@@ -3,6 +3,7 @@ import { Poppins } from 'next/font/google';
 
 import '@/styles/globals.css';
 import { cn } from '@/lib/utils';
+import { ThemeProvider } from './components/theme-provider';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -22,7 +23,14 @@ export default function RootLayout({
   return (
     <html lang='pt-BR'>
       <body className={cn('min-h-screen antialiased', poppins.className)}>
-        {children}
+        <ThemeProvider
+          attribute='class'
+          defaultTheme='system'
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
