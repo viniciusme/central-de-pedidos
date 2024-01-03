@@ -47,13 +47,15 @@ export default function DynamicTable() {
       }}
     >
       <TableHeader>
-        <TableColumn key='name'>NAME</TableColumn>
-        <TableColumn key='role'>ROLE</TableColumn>
-        <TableColumn key='status'>STATUS</TableColumn>
+        <TableColumn key='numOrder'>Número Pedido</TableColumn>
+        <TableColumn key='dateOrder'>Data do Pedido</TableColumn>
+        <TableColumn key='nfe'>NFe</TableColumn>
+        <TableColumn key='lastStatus'>Situação</TableColumn>
+        <TableColumn key='numOrder'>Rastrear Pedido</TableColumn>
       </TableHeader>
       <TableBody items={items}>
         {(item) => (
-          <TableRow key={item.name}>
+          <TableRow key={item.numOrder}>
             {(columnKey) => (
               <TableCell>{getKeyValue(item, columnKey)}</TableCell>
             )}
