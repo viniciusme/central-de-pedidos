@@ -10,29 +10,32 @@ import {
   TableRow,
   TableCell,
   Pagination,
-  getKeyValue,
 } from '@nextui-org/react';
 import { api } from '@/lib/api';
-import { users } from '@/lib/data';
+
+interface IOrders {
+  numOrder: number;
+  dateOrder: string;
+  nfe: string;
+  lastStatus: string;
+}
 
 export default function DynamicTable() {
   const router = useRouter();
+  const userToken = window.localStorage.getItem('tokenAuth');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [orders, setOrders] = useState<IOrders[]>([]);
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
-
-  const pages = Math.ceil(users.length / rowsPerPage);
+  const pages = Math.ceil(orders.length / rowsPerPage);
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-
-    return users.slice(start, end);
-  }, [page, users]);
+    return orders.slice(start, end);
+  }, [page, orders]);
 
   const checkUserToken = async () => {
-    const userToken = window.localStorage.getItem('tokenAuth');
-
     if (!userToken || userToken === 'undefined') {
       setIsLoggedIn(false);
       router.push('/');
@@ -55,46 +58,80 @@ export default function DynamicTable() {
     }
   };
 
+  async function getLatestOrders(page: number = 1) {
+    await api
+      .get(`/orders/latest-orders`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then((response) => {
+        setOrders(response.data);
+      })
+      .catch((error) => {
+        setOrders([]);
+        console.log(error);
+      });
+  }
+
+  useEffect(() => {
+    getLatestOrders();
+  }, []);
+
   useEffect(() => {
     checkUserToken();
   }, [isLoggedIn]);
 
   return (
-    <Table
-      aria-label='Example table with client side pagination'
-      bottomContent={
-        <div className='flex w-full justify-center'>
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            color='secondary'
-            page={page}
-            total={pages}
-            onChange={(page) => setPage(page)}
-          />
-        </div>
-      }
-      classNames={{
-        wrapper: 'min-h-[222px]',
-      }}
-    >
-      <TableHeader>
-        <TableColumn key='numOrder'>Número Pedido</TableColumn>
-        <TableColumn key='dateOrder'>Data do Pedido</TableColumn>
-        <TableColumn key='nfe'>NFe</TableColumn>
-        <TableColumn key='lastStatus'>Situação</TableColumn>
-        <TableColumn key='numOrderTwo'>Rastrear Pedido</TableColumn>
-      </TableHeader>
-      <TableBody items={items}>
-        {(item) => (
-          <TableRow key={item.numOrder}>
-            {(columnKey) => (
-              <TableCell>{getKeyValue(item, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <>
+      {orders.length > 0 ? (
+        <Table
+          aria-label='Example table with client side pagination'
+          bottomContent={
+            <div className='flex w-full justify-center'>
+              <Pagination
+                isCompact
+                showControls
+                showShadow
+                color='secondary'
+                page={page}
+                total={pages}
+                onChange={(page) => setPage(page)}
+              />
+            </div>
+          }
+          classNames={{
+            wrapper: 'min-h-[222px]',
+          }}
+        >
+          <TableHeader>
+            <TableColumn>Número Pedido</TableColumn>
+            <TableColumn>Data do Pedido</TableColumn>
+            <TableColumn>NFe</TableColumn>
+            <TableColumn>Situação</TableColumn>
+            <TableColumn>Rastrear Pedido</TableColumn>
+          </TableHeader>
+          <TableBody>
+            {items.map((order: IOrders) => (
+              <TableRow key={order.numOrder}>
+                <TableCell>{order.numOrder}</TableCell>
+                <TableCell>{order.dateOrder}</TableCell>
+                <TableCell>
+                  <a href={order.nfe} target='_blank' rel='noopener noreferrer'>
+                    IMAGEM
+                  </a>
+                </TableCell>
+                <TableCell>{order.lastStatus}</TableCell>
+                <TableCell>
+                  <a href={`/order-details/${order.numOrder}`}>DETALHES</a>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <p>Nenhum pedido para ser mostrado.</p>
+      )}
+    </>
   );
 }
