@@ -1,6 +1,6 @@
-import Header from '../components/header';
+import Header from "../components/header";
 
-export default function LatestOrdersLayout({
+export default function OrderDetailsLayout({
   children,
 }: {
   children: React.ReactNode;
